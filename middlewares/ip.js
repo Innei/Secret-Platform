@@ -8,7 +8,7 @@ module.exports = (options = {}) => {
     const dUNIX = new Date()
     const day = dUNIX.getDate()
     const month = dUNIX.getMonth() + 1
-    const year = dUNIX.getYear() + 1900
+    const year = dUNIX.getFullYear()
     const formatTime = moment(dUNIX).format('YYYY-MM-DD HH:mm:ss')
     // 获取 ip
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress

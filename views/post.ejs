@@ -4,12 +4,56 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="/static/main.css" />
     <title><%= title %> -- 秘Po</title>
+    <style>
+      .wrap {
+        margin-top: 5rem;
+        min-height: calc(100vh - 13rem);
+      }
+      .desc {
+        display: flex;
+        justify-content: space-around;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        color: #34495e;
+      }
+      h2 {
+        text-align: right;
+      }
+      footer {
+        text-align: center;
+        margin-top: 3rem;
+        padding-bottom: 3rem;
+      }
+    </style>
   </head>
   <body>
-    <h2><%= title %></h2>
-    <div>
-      <%= content %>
+    <header></header>
+    <div class="wrap min">
+      <h2><%= title %></h2>
+      <small class="desc">
+        <span>
+          作者: <%= author %>
+        </span>
+        <span>
+          创建时间: <%= createTime %>
+        </span>
+        <span>
+          限制访问次数: <%= limitTime %>
+        </span>
+      </small>
+      <article>
+        <%- content %>
+      </article>
     </div>
+    <footer>
+      <p>© <span id="time"></span> Secret Platform</p>
+    </footer>
   </body>
 </html>
+
+<script>
+  var time = document.getElementById('time')
+  time.innerText = new Date().getFullYear()
+</script>
