@@ -11,3 +11,21 @@ Content-Type: application/json
 
 ### fetch all data
 get {{api}}
+
+### signup
+post {{api}}/user/signup
+Content-Type: application/json
+
+{
+  "username": "yiny",
+  "password": "1"
+}
+
+### login
+post {{api}}/login
+Content-Type: application/json
+
+{
+  "username": "yiny",
+  "password": "1"
+}

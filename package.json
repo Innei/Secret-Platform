@@ -1,0 +1,34 @@
+{
+  "name": "secret-platform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "chalk": "^2.4.2",
+    "cors": "^2.8.5",
+    "ejs": "^2.6.2",
+    "express": "^5.0.0-alpha.7",
+    "http-assert": "^1.4.1",
+    "jsonwebtoken": "^8.5.1",
+    "markdown-it": "^9.1.0",
+    "moment": "^2.24.0",
+    "mongoose": "^5.6.10",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Innei/Secret-Platform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Innei/Secret-Platform/issues"
+  },
+  "homepage": "https://github.com/Innei/Secret-Platform#readme"
+}
