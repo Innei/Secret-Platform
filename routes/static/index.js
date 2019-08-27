@@ -13,7 +13,13 @@ module.exports = app => {
   router.get('/', (req, res) => {
     res.render('index')
   })
-  router.get('/:id', ip, async (req, res) => {
+  
+  // 注册页面
+  router.get('/signup', ip, async (req, res) => {
+    res.render('user/index')
+  })
+  // 渲染文章
+  router.get('/posts/:id', ip, async (req, res) => {
     const id = req.params.id
     await Post.findById(id)
       .then(model => {
@@ -50,5 +56,5 @@ module.exports = app => {
         return res.status(404).send({ msg: '页面不存在' })
       })
   })
-  app.use('/posts/', router)
+  app.use('/', router)
 }

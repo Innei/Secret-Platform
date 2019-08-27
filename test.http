@@ -17,7 +17,7 @@ post {{api}}/user/signup
 Content-Type: application/json
 
 {
-  "username": "yiny",
+  "username": "yiny2",
   "password": "1"
 }
 

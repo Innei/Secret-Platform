@@ -2,12 +2,14 @@ const express = require('express')
 const log = require('./plugins/log')
 const app = express()
 const fs = require('fs')
+const bodyParser = require('body-parser')
 try {
   const config = require('./config.inc.js')
   app.set('config', config)
 } catch (err) {
   console.log('配置文件不存在, 请使用同目录下的 install.js 进行安装')
 }
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(require('cors')())
 app.set('views', require('path').join(__dirname, 'views'))
 app.set('view engine', 'ejs')
