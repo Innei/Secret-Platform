@@ -18,7 +18,7 @@ const Schema = new mongoose.Schema({
   },
   options: {
     type: Object,
-    default: null
+    default: {}
   }
 })
 

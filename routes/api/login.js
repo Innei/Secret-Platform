@@ -22,7 +22,7 @@ module.exports = app => {
         const uid = user.uid
         const username = user.username
         const key = app.get('config').key
-        const token = jwt.sign({ uid, username }, key)
+        const token = jwt.sign({ uid, username, id: user._id}, key)
         res.send({ msg: '验证成功', token })
       }
     } catch (err) {

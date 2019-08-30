@@ -1,7 +1,7 @@
 const express = require('express')
 const log = require('./plugins/log')
 const app = express()
-const fs = require('fs')
+
 const bodyParser = require('body-parser')
 try {
   const config = require('./config.inc.js')

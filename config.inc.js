@@ -1,1 +1,1 @@
-module.exports = {"domain":"localhost","key":"112233"}
+module.exports = {"domain":"http://localhost","key":"yiny"}
