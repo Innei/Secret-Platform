@@ -1,6 +1,8 @@
 const express = require('express')
 const User = require('./../../models/User')
 const Config = require('../../models/Config')
+const Post = require('../../models/Post.js')
+const CheckUserIsExist = require('../../middlewares/CheckUserIsExist.js')
 const assert = require('http-assert')
 module.exports = app => {
   const router = express.Router()
@@ -33,15 +35,22 @@ module.exports = app => {
     res.send(model)
   })
 
-  router.get('/:id', async (req, res) => {
-
+  router.get('/:id', CheckUserIsExist(), async (req, res) => {
     const id = req.params.id
-    assert(id, 422, '无效的 ID')
     const model = await User.findOne({uid: id})
-    assert(model, 422, '不存在此用户')
-
     res.send(model)
+  })
 
+  router.get('/get_info/:id', CheckUserIsExist(), async (req, res) => {
+    const user = await User.findOne({uid: req.params.id})
+    const posts = await Post.find({author: user.username}).limit(5).sort({_id: -1})
+
+    // 生成响应数据
+    const userInfo = {
+      ...user._doc,
+      recentlyPosts: posts
+    }
+    res.send(userInfo)
   })
   app.use('/api/user', router)
 }
