@@ -1,6 +1,11 @@
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
-module.exports = (options) => {
+/**
+ * options => func 接受一个函数，用于处理用户模型
+ * @param options
+ * @return {Function}
+ */
+module.exports = (options = {}) => {
   /**
    * 验证是否为空的验证头，并将 Username 解密挂载到 req.username 上, user 模型挂载到 req.user_mod
    *
@@ -17,6 +22,11 @@ module.exports = (options) => {
       try {
         const id = obj.id
         const model = (await User.findById(id))
+
+        // 对模型进行操作的函数
+        if (options.func)
+          options.func(model)
+
         if (model && model.uid && model.username) {
           req.username = model.username
           req.user_mod = model
