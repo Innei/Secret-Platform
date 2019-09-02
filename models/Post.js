@@ -13,12 +13,14 @@ const schema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  // 创建时间
   createTime: {
-    type: String,
-    default: String(Date.now())
+    type: Number,
+    default: Date.now()
   },
   modifyTime: {
-    type: String
+    type: Number,
+    default: Date.now()
   },
   views: {
     type: Number,
@@ -28,13 +30,15 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  // 是否过期
   isOutdate: {
     type: Boolean,
     default: false
   },
+  // 过期时间 默认 7 天
   outdateTime: {
-    type: String,
-    default: (new Date(Date.now() + 1000 * 60 * 60 * 24)).getTime()
+    type: Number,
+    default: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).getTime()
   },
   secret: {
     type: String,
@@ -46,9 +50,15 @@ const schema = new mongoose.Schema({
       }
     }
   },
+  // 限制访问次数 默认不限制
   limitTime: {
     type: Number,
     default: -1
-  }
+  },
+  // // 状态 0 => 未审核 1 => 发布 2 => 已过期
+  // state: {
+  //   type: Number,
+  //   default: 1
+  // }
 })
 module.exports = mongoose.model('Post', schema)

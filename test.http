@@ -1,14 +1,14 @@
 @api=http://localhost:3000/api
 
 ###
-post {{api}}
+post {{api}}/posts/create
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2OWUwMjk1ZmNjMTgwNzRjY2FiNDZjIiwiaWF0IjoxNTY3MjIwNDYzfQ.za9XAOZD9zy2QziRBQcg3E821-k6Yx9Ymd3odaLLaf0
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3NDI1NzcyfQ.J5idUWC6WnSNjd5N5ChIUfY3LrCSLuGPJNC2tYaM9K4
 
 {
-  "title": "new",
+  "title": "Windows Core OS",
   "content": "传闻已久的Windows Core OS正在为“下一代”微软设备做准备，最新的微软软件工程师LinkedIn个人资料信息暗示如此。“经验丰富的C++开发人员，具有云管理操作系统开发方面的专业知识。在物联网设备，下一代WCOS设备，Windows桌面，HoloLens和Windows Server上提供基于Azure的设备管理功能和协议，”该工程师在简介中写道。",
-  "author": "yiny2"
+  "author": "test"
 }
 
 ### fetch all data
@@ -19,7 +19,7 @@ post {{api}}/user/signup
 Content-Type: application/json
 
 {
-  "username": "test13",
+  "username": "test",
   "password": "1"
 }
 
@@ -34,3 +34,6 @@ Content-Type: application/json
 
 ### get user info 
 get {{api}}/user/5
+
+### get posts list
+get {{api}}/posts

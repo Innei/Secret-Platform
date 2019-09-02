@@ -22,8 +22,7 @@ app.use(express.json())
 require('./routes/api/index')(app)
 require('./plugins/db')(app)
 require('./routes/static/index')(app)
-require('./routes/api/user')(app)
-require('./routes/api/login')(app)
+
 
 app.use('/static', express.static('./static'))
 
