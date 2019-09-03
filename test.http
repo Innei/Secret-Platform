@@ -36,4 +36,5 @@ Content-Type: application/json
 get {{api}}/user/5
 
 ### get posts list
-get {{api}}/posts
+get {{api}}/posts?&state=2
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3NDI1NzcyfQ.J5idUWC6WnSNjd5N5ChIUfY3LrCSLuGPJNC2tYaM9K4
