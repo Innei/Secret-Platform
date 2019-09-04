@@ -16,7 +16,7 @@ module.exports = (options = {}) => {
 
     const token = req.headers['authorization']
     if (token === undefined) {
-      return res.status(422).send({msg: '空的验证头', code: 1})
+      return res.status(401).send({msg: '空的验证头', code: 1})
     } else {
       const obj = jwt.verify(token, req.app.get('config').key)
       try {
@@ -31,7 +31,7 @@ module.exports = (options = {}) => {
           req.username = model.username
           req.user_mod = model
         } else {
-          return res.status(422).send({
+          return res.status(401).send({
             msg: '用户不存在',
             code: 2
           })

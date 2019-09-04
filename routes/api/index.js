@@ -7,7 +7,7 @@ module.exports = app => {
   app.use('/api', router)
 
   require('./user')(app)
-  require('./login')(app)
+  // require('./login')(app)
 
   router.use('/posts/', require('./posts'))
 }

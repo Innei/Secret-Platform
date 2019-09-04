@@ -96,32 +96,34 @@ router.get('/', auth(), async (req, res) => {
             }
           ]
         } */
-  const model = (keyword || state !== -1)
-    ? await Post.find({
-        author: req.username,
-        $or: [
-          {
-            title: new RegExp(keyword, 'ig')
-          },
-          { content: new RegExp(keyword, 'ig') }
-        ],
-        ...status
-      }).sort({ modifyTime: 1 })
-    : await Post.find({
-        author: req.username,
-        // ...status
-      })
-        .skip((page - 1) * size)
-        .limit(size)
-        .sort({ modifyTime: 1 })
+  const model =
+    keyword || state !== -1
+      ? await Post.find({
+          author: req.username,
+          $or: [
+            {
+              title: new RegExp(keyword, 'ig')
+            },
+            { content: new RegExp(keyword, 'ig') }
+          ],
+          ...status
+        }).sort({ modifyTime: 1 })
+      : await Post.find({
+          author: req.username
+          // ...status
+        })
+          .skip((page - 1) * size)
+          .limit(size)
+          .sort({ modifyTime: 1 })
 
-  const totalPage = (keyword || state !== -1)
-    ? // ? Math.ceil(model.length / size)
-      1
-    : Math.ceil(
-        (await User.findOne({ username: req.username })).options.publish_nums /
-          size
-      )
+  const totalPage =
+    keyword || state !== -1
+      ? // ? Math.ceil(model.length / size)
+        1
+      : Math.ceil(
+          (await User.findOne({ username: req.username })).options
+            .publish_nums / size
+        )
   const currentPage = Number(page)
   res.send({
     options: {
@@ -143,12 +145,12 @@ router.get('/:id', ip, (req, res) => {
       if (model) {
         return res.send(model)
       } else {
-        return res.status(404).send({ msg: '页面不存在' })
+        return res.status(404).send({ msg: '文章不存在' })
       }
     })
     .catch(err => {
       log(`IP: ${req.ip} try a invalid ID to query.\n ${chalk.yellow(err)}`, 2)
-      return res.status(404).send({ msg: '页面不存在' })
+      return res.status(404).send({ msg: '文章不存在' })
     })
 })
 
@@ -159,7 +161,7 @@ router.post(
 
     // 为 个人用户 更新 文章发布数 方法
     async func(model) {
-      await model.update({
+      await model.updateOne({
         $inc: {
           ['options.publish_nums']: 1
         }
@@ -168,6 +170,7 @@ router.post(
   }),
   async (req, res) => {
     const body = req.body
+    body.author = req.username
     try {
       const model = await Post.create(body)
 
@@ -179,4 +182,7 @@ router.post(
   }
 )
 
+router.put('/edit', auth(), async (req, res) => {
+  
+})
 module.exports = router

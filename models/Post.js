@@ -40,6 +40,7 @@ const schema = new mongoose.Schema({
     type: Number,
     default: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).getTime()
   },
+  // TODO 文章加密
   secret: {
     type: String,
     default: '',

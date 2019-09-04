@@ -7,12 +7,11 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoi
 
 {
   "title": "Windows Core OS",
-  "content": "传闻已久的Windows Core OS正在为“下一代”微软设备做准备，最新的微软软件工程师LinkedIn个人资料信息暗示如此。“经验丰富的C++开发人员，具有云管理操作系统开发方面的专业知识。在物联网设备，下一代WCOS设备，Windows桌面，HoloLens和Windows Server上提供基于Azure的设备管理功能和协议，”该工程师在简介中写道。",
-  "author": "test"
+  "content": "传闻已久的Windows Core OS正在为“下一代”微软设备做准备，最新的微软软件工程师LinkedIn个人资料信息暗示如此。“经验丰富的C++开发人员，具有云管理操作系统开发方面的专业知识。在物联网设备，下一代WCOS设备，Windows桌面，HoloLens和Windows Server上提供基于Azure的设备管理功能和协议，”该工程师在简介中写道。"
 }
 
 ### fetch all data
-get {{api}}
+get {{api}}/posts/5d6cf1a404c0ba6be617b96f
 
 ### signup
 post {{api}}/user/signup
@@ -24,7 +23,7 @@ Content-Type: application/json
 }
 
 ### login
-post {{api}}/login
+post {{api}}/user/login
 Content-Type: application/json
 
 {
