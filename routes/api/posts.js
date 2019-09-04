@@ -107,14 +107,14 @@ router.get('/', auth(), async (req, res) => {
             { content: new RegExp(keyword, 'ig') }
           ],
           ...status
-        }).sort({ modifyTime: 1 })
+        }).sort({ modifyTime: -1 })
       : await Post.find({
           author: req.username
           // ...status
         })
           .skip((page - 1) * size)
           .limit(size)
-          .sort({ modifyTime: 1 })
+          .sort({ modifyTime: -1 })
 
   const totalPage =
     keyword || state !== -1
@@ -177,12 +177,44 @@ router.post(
       return res.send(model)
     } catch (e) {
       console.log(e)
-      res.send({ msg: '创建时出现错误', code: 1 })
+      res.status(500).send({ msg: '创建时出现错误', code: 1 })
     }
   }
 )
 
 router.put('/edit', auth(), async (req, res) => {
-  
+  const id = req.query.id
+  if (!id) {
+    return res.status(404).send({ msg: '文章不存在' })
+  }
+  const body = req.body
+  body.modifyTime = Date.now()
+  const model = await Post.updateOne(
+    { _id: new require('mongoose').Types.ObjectId(id) },
+    body
+  )
+
+  res.send(model)
 })
+
+router.delete(
+  '/:id',
+  auth({
+    async func(model) {
+      await model.updateOne({
+        $inc: {
+          ['options.publish_nums']: -1
+        }
+      })
+    }
+  }),
+  async (req, res) => {
+    const id = req.params.id
+    const model = await Post.deleteOne({
+      _id: new require('mongoose').Types.ObjectId(id)
+    })
+
+    res.send(model)
+  }
+)
 module.exports = router

@@ -26,7 +26,7 @@ module.exports = (options = {}) => {
       }
     })
     // console.log(`[${chalk.yellow(formatTime)}] 来源IP ${chalk.green(ip)}`)
-    log(`From IP ${chalk.green(ip)} to ${req.originalUrl} ${options.msg ? `:${options.msg}` : ''}`, 0)
+    log(`From IP ${chalk.green(ip)} to ${req.method} ${req.originalUrl} ${options.msg ? `:${options.msg}` : ''}`, 0)
     req.ip = ip
     await next()
   }
