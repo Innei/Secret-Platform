@@ -10,4 +10,5 @@ module.exports = app => {
   // require('./login')(app)
 
   router.use('/posts/', require('./posts'))
+  router.use('/upload', require('./upload'))
 }

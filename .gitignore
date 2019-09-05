@@ -63,3 +63,4 @@ typings/
 # user configuration
 config.js
 online.http
+/.idea

@@ -3,7 +3,7 @@
 ###
 post {{api}}/posts/create
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3NDI1NzcyfQ.J5idUWC6WnSNjd5N5ChIUfY3LrCSLuGPJNC2tYaM9K4
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoieWlueTIiLCJpZCI6IjVkNjkwNzM2YjE4YzFhM2U4Y2MxZmMyOSIsImlhdCI6MTU2NzY2MzgyN30.DHkpb7ssc1wJTl81nrHaNXZusvlVLuwtQIoPzIN5azc
 
 {
   "title": "Windows Core OS",
@@ -27,7 +27,7 @@ post {{api}}/user/login
 Content-Type: application/json
 
 {
-  "username": "test",
+  "username": "yiny2",
   "password": "1"
 }
 

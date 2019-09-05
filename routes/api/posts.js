@@ -4,9 +4,11 @@ const Config = require('../../models/Config')
 const User = require('./../../models/User')
 
 const ip = require('../../middlewares/ip')()
-const log = require('./../../plugins/log')
-const chalk = require('chalk')
 const auth = require('./../../middlewares/auth')
+const log = require('./../../plugins/log')
+const checkPostField = require('../../middlewares/checkPostField')
+
+const chalk = require('chalk')
 const router = express.Router({ mergeParams: true })
 
 // router.get('/', async (req, res) => {
@@ -156,7 +158,9 @@ router.get('/:id', ip, (req, res) => {
 
 router.post(
   '/create',
+  checkPostField(),
   auth({
+    // 验证字段
     // 增加到个人用户 文章发布数 等 其他信息的更新
 
     // 为 个人用户 更新 文章发布数 方法
@@ -182,7 +186,7 @@ router.post(
   }
 )
 
-router.put('/edit', auth(), async (req, res) => {
+router.put('/edit', checkPostField(), auth(), async (req, res) => {
   const id = req.query.id
   if (!id) {
     return res.status(404).send({ msg: '文章不存在' })
@@ -211,10 +215,12 @@ router.delete(
   async (req, res) => {
     const id = req.params.id
     const model = await Post.deleteOne({
-      _id: new require('mongoose').Types.ObjectId(id)
+      _id: new require('mongoose').Types.ObjectId(id),
+      author: req.username
     })
 
     res.send(model)
   }
 )
+
 module.exports = router
