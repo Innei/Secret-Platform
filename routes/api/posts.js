@@ -159,25 +159,43 @@ router.get('/:id', ip, (req, res) => {
 router.post(
   '/create',
   checkPostField(),
-  auth({
+  auth(/* {
     // 验证字段
     // 增加到个人用户 文章发布数 等 其他信息的更新
 
     // 为 个人用户 更新 文章发布数 方法
-    async func(model) {
+    async func(model, req, res) {
       await model.updateOne({
         $inc: {
           ['options.publish_nums']: 1
         }
       })
+      const pid = model.options.publish_nums
+      req.pid = pid
     }
-  }),
+  } */),
   async (req, res) => {
     const body = req.body
     body.author = req.username
+    body.createTime = body.modifyTime = Date.now()
     try {
-      const model = await Post.create(body)
+      const user = await User.findOne({ uid: req.uid })
+      const pid = user.options.publish_nums + 1
+      // 判断是否存在草稿
+      if (body.state === 0) {
+        const hasDraft = await Post.findOne({ pid })
+        if (!hasDraft) {
+        }
+      }
+      body.state = 1
 
+      body.pid = pid
+      const model = await Post.create(body)
+      await user.updateOne({
+        $inc: {
+          ['options.publish_nums']: 1
+        }
+      })
       return res.send(model)
     } catch (e) {
       console.log(e)
@@ -188,22 +206,35 @@ router.post(
 
 router.put('/edit', checkPostField(), auth(), async (req, res) => {
   const id = req.query.id
+  const update = req.query.update || false
+  const pid = req.query.pid || null
   if (!id) {
     return res.status(404).send({ msg: '文章不存在' })
   }
-  const body = req.body
-  body.modifyTime = Date.now()
-  const model = await Post.updateOne(
-    { _id: new require('mongoose').Types.ObjectId(id) },
-    body
-  )
+  try {
+    const body = req.body
+    body.modifyTime = Date.now()
+    if (update && pid) {
+      delete body._id
+      delete body.state
+      await Post.updateOne({ pid: Number(pid), state: 1 }, body)
+      await Post.deleteOne({ _id: id })
+      return res.send({ ok: 1 })
+    }
+    const model = await Post.updateOne(
+      { _id: new require('mongoose').Types.ObjectId(id) },
+      body
+    )
 
-  res.send(model)
+    res.send(model)
+  } catch (e) {
+    res.status(500).send({ ok: 0 })
+  }
 })
 
 router.delete(
   '/:id',
-  auth({
+  auth(/* {
     async func(model) {
       await model.updateOne({
         $inc: {
@@ -211,16 +242,69 @@ router.delete(
         }
       })
     }
-  }),
+  } */),
   async (req, res) => {
     const id = req.params.id
-    const model = await Post.deleteOne({
-      _id: new require('mongoose').Types.ObjectId(id),
-      author: req.username
-    })
-
-    res.send(model)
+    try {
+      const user = await User.findOne({ uid: req.uid })
+      const model = await Post.findOneAndDelete({
+        _id: new require('mongoose').Types.ObjectId(id),
+        author: req.username
+      })
+      if (model.state === 1) {
+        await user.updateOne({
+          $inc: {
+            ['options.publish_nums']: -1
+          }
+        })
+      }
+      res.send({ ok: 1 })
+    } catch (e) {
+      res.status(500).send({ ok: 0 })
+    }
   }
 )
+
+// 保存与草稿
+router.post('/save', checkPostField(), auth(), async (req, res) => {
+  const id = req.query.id
+  const isDraft = Number(req.query.draft) === 1 ? true : false
+  const body = req.body
+  body.author = req.username
+  body.state = 0
+  body.modifyTime = Date.now()
+
+  // 已存在文章 则创建副本
+  try {
+    if (id && !isDraft) {
+      // 创建副本
+      const pid = (await Post.findById(id)).pid
+      body.pid = pid
+      // 判断是否已存在草稿
+      const draftQuery = await Post.findOne({ pid, state: 0, _id: id })
+      const isExistDraft = draftQuery ? true : false
+
+      // 如果已存在草稿
+      if (isExistDraft) {
+        await draftQuery.update(body)
+      } else {
+        delete body._id
+        await Post.create(body)
+      }
+    } else if (id && isDraft) {
+      const model = await Post.findById(id)
+
+      await model.updateOne(body)
+    } else {
+      delete body._id
+      await Post.create(body)
+    }
+  } catch (e) {
+    console.log(e)
+    res.status(400).send({ ok: 0 })
+  }
+
+  res.send({ ok: 1 })
+})
 
 module.exports = router

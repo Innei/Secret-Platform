@@ -1,13 +1,16 @@
 const mongoose = require('mongoose')
 const Config = require('./Config')
 const schema = new mongoose.Schema({
+  pid: {
+    type: Number
+  },
   author: {
     type: String,
-    default: ''
+    required: true
   },
   title: {
     type: String,
-    default: ''
+    required: true
   },
   content: {
     type: String,
@@ -56,10 +59,10 @@ const schema = new mongoose.Schema({
     type: Number,
     default: -1
   },
-  // // 状态 0 => 未审核 1 => 发布 2 => 已过期
-  // state: {
-  //   type: Number,
-  //   default: 1
-  // }
+  // 状态 0 => 草稿 1 => 发布
+  state: {
+    type: Number,
+    default: 1
+  }
 })
 module.exports = mongoose.model('Post', schema)

@@ -23,6 +23,9 @@ module.exports = app => {
     const id = req.params.id
     await Post.findById(id)
       .then(model => {
+        if (model.state === 0) {
+          return res.status(404).send({ msg: '页面不存在' })
+        }
         if (
           model &&
           model.limitTime !== 0 &&
