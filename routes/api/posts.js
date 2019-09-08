@@ -299,13 +299,11 @@ router.post('/save', checkPostField(), auth(), async (req, res) => {
       // 判断是否已存在草稿
       const draftQuery = await Post.findOne({ pid, state: 0 })
       const isExistDraft = draftQuery ? true : false
-
+      delete body._id
       // 如果已存在草稿
       if (isExistDraft) {
-        delete body._id
         await draftQuery.update(body)
       } else {
-        delete body._id
         await Post.create(body)
       }
     } else if (id && isDraft) {
@@ -313,7 +311,6 @@ router.post('/save', checkPostField(), auth(), async (req, res) => {
 
       await model.updateOne(body)
     } else {
-      delete body._id
       await Post.create(body)
     }
   } catch (e) {
