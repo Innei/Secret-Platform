@@ -31,7 +31,7 @@ module.exports = app => {
           model.limitTime !== 0 &&
           (!model.isOutdate || Number(model.outdateTime) - Date.now() > 0)
         ) {
-          const render = Object.assign({}, model._doc)
+          const render = model.toObject()
           // console.log(render)
           if (model.limitTime > 0) model.limitTime--
 

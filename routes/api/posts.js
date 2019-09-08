@@ -143,9 +143,19 @@ router.get('/', auth(), async (req, res) => {
 router.get('/:id', ip, (req, res) => {
   const id = req.params.id
   Post.findById(id)
-    .then(model => {
+    .then(async model => {
       if (model) {
-        return res.send(model)
+        // 转换 mongoose 对象为纯 object 对象
+        const doc = model.toObject()
+        if (model.pid && model.state === 1) {
+          const findDraft = await Post.findOne({ pid: model.pid, state: 0 })
+          if (findDraft) {
+            doc.hasDraft = 1
+            doc.draftId = findDraft._id
+            console.log(doc)
+          }
+        }
+        return res.send(doc)
       } else {
         return res.status(404).send({ msg: '文章不存在' })
       }
@@ -181,16 +191,22 @@ router.post(
     try {
       const user = await User.findOne({ uid: req.uid })
       const pid = user.options.publish_nums + 1
+      let model
+      body.pid = pid
       // 判断是否存在草稿
       if (body.state === 0) {
         const hasDraft = await Post.findOne({ pid })
         if (!hasDraft) {
+          const pub = Object.assign({}, body)
+          delete pub._id
+          pub.state = 1
+          model = await Post.create(pub)
+          await Post.deleteOne({ _id: body._id })
         }
       }
       body.state = 1
 
-      body.pid = pid
-      const model = await Post.create(body)
+      model = model || (await Post.create(body))
       await user.updateOne({
         $inc: {
           ['options.publish_nums']: 1
@@ -281,11 +297,12 @@ router.post('/save', checkPostField(), auth(), async (req, res) => {
       const pid = (await Post.findById(id)).pid
       body.pid = pid
       // 判断是否已存在草稿
-      const draftQuery = await Post.findOne({ pid, state: 0, _id: id })
+      const draftQuery = await Post.findOne({ pid, state: 0 })
       const isExistDraft = draftQuery ? true : false
 
       // 如果已存在草稿
       if (isExistDraft) {
+        delete body._id
         await draftQuery.update(body)
       } else {
         delete body._id
