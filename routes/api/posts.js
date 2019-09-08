@@ -152,7 +152,6 @@ router.get('/:id', ip, (req, res) => {
           if (findDraft) {
             doc.hasDraft = 1
             doc.draftId = findDraft._id
-            console.log(doc)
           }
         }
         return res.send(doc)
@@ -234,15 +233,17 @@ router.put('/edit', checkPostField(), auth(), async (req, res) => {
       delete body._id
       delete body.state
       await Post.updateOne({ pid: Number(pid), state: 1 }, body)
-      await Post.deleteOne({ _id: id })
+      // await Post.deleteOne({ _id: id })
+
       return res.send({ ok: 1 })
     }
-    const model = await Post.updateOne(
+    const model = await Post.findOneAndUpdate(
       { _id: new require('mongoose').Types.ObjectId(id) },
       body
     )
-
-    res.send(model)
+    // 删除草稿
+    await Post.deleteOne({ pid: model.pid, state: 0 })
+    res.send({ ok: 0 })
   } catch (e) {
     res.status(500).send({ ok: 0 })
   }
