@@ -4,33 +4,51 @@ const schema = new mongoose.Schema({
   // comment id
   cid: {
     type: Number,
-    default: 1
+    required: true
   },
   // post id
   pid: {
-    type: Number
+    type: Number,
+    required: true
   },
   content: {
-    type: String
+    type: String,
+    required: true
   },
-  create_time: {
+  createTime: {
     type: Number,
     default: Date.now()
   },
   author: {
+    type: String,
+    required: true
+  },
+  isPoster: {
+    type: Boolean,
+    required: true
+  },
+  email: {
+    required: true,
     type: String
-  },
-  author_id: {
-    type: Number
-  },
-  owner_id: {
-    type: Number
   },
   url: {
     type: String
   },
   parent: {
     type: Number
+  },
+  ipAddress: {
+    type: String,
+    required: true
+  },
+  userAgent: {
+    type: String
+  },
+  // 0 审核 1 发布 2 垃圾
+  state: {
+    type: Number,
+    required: true,
+    default: 0
   }
 })
 

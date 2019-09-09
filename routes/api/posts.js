@@ -189,7 +189,7 @@ router.post(
     body.createTime = body.modifyTime = Date.now()
     try {
       const user = await User.findOne({ uid: req.uid })
-      const pid = user.options.publish_nums + 1
+      const pid = user.options.publish_total + 1
       let model
       body.pid = pid
       // 判断是否存在草稿
@@ -208,7 +208,8 @@ router.post(
       model = model || (await Post.create(body))
       await user.updateOne({
         $inc: {
-          ['options.publish_nums']: 1
+          ['options.publish_nums']: 1,
+          ['options.publish_total']: 1
         }
       })
       return res.send(model)
@@ -232,8 +233,10 @@ router.put('/edit', checkPostField(), auth(), async (req, res) => {
     if (update && pid) {
       delete body._id
       delete body.state
+      // 更新文章
       await Post.updateOne({ pid: Number(pid), state: 1 }, body)
-      // await Post.deleteOne({ _id: id })
+      // 删除草稿 (可选)
+      await Post.deleteOne({ _id: id })
 
       return res.send({ ok: 1 })
     }
@@ -322,4 +325,5 @@ router.post('/save', checkPostField(), auth(), async (req, res) => {
   res.send({ ok: 1 })
 })
 
+router.use('/comments', require('./comments'))
 module.exports = router

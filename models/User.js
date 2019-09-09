@@ -23,7 +23,8 @@ const Schema = new mongoose.Schema({
   options: {
     type: Object,
     default: {
-      publish_nums: 0
+      publish_nums: 0,
+      publish_total: 0
     }
   }
 })
