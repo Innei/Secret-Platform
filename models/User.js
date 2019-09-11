@@ -24,7 +24,9 @@ const Schema = new mongoose.Schema({
     type: Object,
     default: {
       publish_nums: 0,
-      publish_total: 0
+      publish_total: 0,
+      comments_total: 0,
+      comments_nums: 0
     }
   }
 })

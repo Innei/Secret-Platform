@@ -11,6 +11,10 @@ const schema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  post: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "Post"
+  },
   content: {
     type: String,
     required: true

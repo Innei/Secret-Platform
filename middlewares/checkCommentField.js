@@ -1,3 +1,16 @@
+function getClientIP(req) {
+  var ip =
+    req.headers['x-forwarded-for'] ||
+    req.ip ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.connection.socket.remoteAddress ||
+    ''
+  if (ip.split(',').length > 0) {
+    ip = ip.split(',')[0]
+  }
+  return ip
+}
 module.exports = options => {
   return async (req, res, next) => {
     const body = req.body
@@ -12,7 +25,10 @@ module.exports = options => {
     } else if (!body.pid) {
       return res.status(422).send({ msg: '评论文章不能为空' })
     }
-
-    next()
+    if (!body.isPoster) {
+      req.body.isPoster = false
+    }
+    req.body.ipAddress = getClientIP(req)
+    await next()
   }
 }

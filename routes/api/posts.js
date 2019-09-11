@@ -15,7 +15,7 @@ const router = express.Router({ mergeParams: true })
 //   const model = await Post.find({})
 //   res.send(model)
 // })
-router.get('/', auth(), async (req, res) => {
+router.get('/list', auth(), async (req, res) => {
   const page = req.query.page || 1
   const size = req.query.size || 10
   const keyword = req.query.keyword || ''
@@ -140,8 +140,8 @@ router.get('/', auth(), async (req, res) => {
   })
 })
 
-router.get('/:id', ip, (req, res) => {
-  const id = req.params.id
+router.get('/', ip, (req, res) => {
+  const id = req.query.id
   Post.findById(id)
     .then(async model => {
       if (model) {
@@ -253,7 +253,7 @@ router.put('/edit', checkPostField(), auth(), async (req, res) => {
 })
 
 router.delete(
-  '/:id',
+  '/',
   auth(/* {
     async func(model) {
       await model.updateOne({
@@ -264,23 +264,28 @@ router.delete(
     }
   } */),
   async (req, res) => {
-    const id = req.params.id
+    const id = req.query.id
+    if (!id) {
+      return res.status(400).send({ ok: 0, msg: '参数不正确' })
+    }
     try {
       const user = await User.findOne({ uid: req.uid })
       const model = await Post.findOneAndDelete({
         _id: new require('mongoose').Types.ObjectId(id),
         author: req.username
       })
-      if (model.state === 1) {
+      if (model && model.state === 1) {
         await user.updateOne({
           $inc: {
             ['options.publish_nums']: -1
           }
         })
+        res.send({ ok: 1 })
+      } else {
+        return res.status(400).send({ ok: 0, msg: '找不到对应的文章' })
       }
-      res.send({ ok: 1 })
     } catch (e) {
-      res.status(500).send({ ok: 0 })
+      return res.status(500).send({ ok: 0 })
     }
   }
 )
@@ -312,8 +317,9 @@ router.post('/save', checkPostField(), auth(), async (req, res) => {
       }
     } else if (id && isDraft) {
       const model = await Post.findById(id)
-
-      await model.updateOne(body)
+      if (model) {
+        await model.update(body)
+      }
     } else {
       await Post.create(body)
     }
