@@ -63,6 +63,10 @@ const schema = new mongoose.Schema({
   state: {
     type: Number,
     default: 1
+  },
+  comments: {
+    type: Number,
+    default: 0
   }
 })
 module.exports = mongoose.model('Post', schema)

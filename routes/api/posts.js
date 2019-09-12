@@ -2,6 +2,7 @@ const express = require('express')
 const Post = require('../../models/Post')
 const Config = require('../../models/Config')
 const User = require('./../../models/User')
+const Comment = require('../../models/Comment')
 
 const ip = require('../../middlewares/ip')()
 const auth = require('./../../middlewares/auth')
@@ -64,40 +65,7 @@ router.get('/list', auth(), async (req, res) => {
     default:
       break
   }
-  /* const status =
-    state === 2
-      ? {
-          $or: [
-            {
-              $and: [
-                {
-                  outdateTime: {
-                    $lt: Date.now()
-                  }
-                },
-                { isOutdate: true }
-              ]
-            },
-            { limitTime: 0 }
-          ]
-        }
-      : {
-          $and: [
-            {
-              $or: [
-                {
-                  outdateTime: {
-                    $gt: Date.now()
-                  }
-                },
-                { isOutdate: false }
-              ]
-            },
-            {
-              limitTime: { $ne: 0 }
-            }
-          ]
-        } */
+
   const model =
     keyword || state !== -1
       ? await Post.find({
@@ -165,60 +133,41 @@ router.get('/', ip, (req, res) => {
     })
 })
 
-router.post(
-  '/create',
-  checkPostField(),
-  auth(/* {
-    // 验证字段
-    // 增加到个人用户 文章发布数 等 其他信息的更新
-
-    // 为 个人用户 更新 文章发布数 方法
-    async func(model, req, res) {
-      await model.updateOne({
-        $inc: {
-          ['options.publish_nums']: 1
-        }
-      })
-      const pid = model.options.publish_nums
-      req.pid = pid
-    }
-  } */),
-  async (req, res) => {
-    const body = req.body
-    body.author = req.username
-    body.createTime = body.modifyTime = Date.now()
-    try {
-      const user = await User.findOne({ uid: req.uid })
-      const pid = user.options.publish_total + 1
-      let model
-      body.pid = pid
-      // 判断是否存在草稿
-      if (body.state === 0) {
-        const hasDraft = await Post.findOne({ pid })
-        if (!hasDraft) {
-          const pub = Object.assign({}, body)
-          delete pub._id
-          pub.state = 1
-          model = await Post.create(pub)
-          await Post.deleteOne({ _id: body._id })
-        }
+router.post('/create', checkPostField(), auth(), async (req, res) => {
+  const body = req.body
+  body.author = req.username
+  body.createTime = body.modifyTime = Date.now()
+  try {
+    const user = await User.findOne({ uid: req.uid })
+    const pid = user.options.publish_total + 1
+    let model
+    body.pid = pid
+    // 判断是否存在草稿
+    if (body.state === 0) {
+      const hasDraft = await Post.findOne({ pid })
+      if (!hasDraft) {
+        const pub = Object.assign({}, body)
+        delete pub._id
+        pub.state = 1
+        model = await Post.create(pub)
+        await Post.deleteOne({ _id: body._id })
       }
-      body.state = 1
-
-      model = model || (await Post.create(body))
-      await user.updateOne({
-        $inc: {
-          ['options.publish_nums']: 1,
-          ['options.publish_total']: 1
-        }
-      })
-      return res.send(model)
-    } catch (e) {
-      console.log(e)
-      res.status(500).send({ msg: '创建时出现错误', code: 1 })
     }
+    body.state = 1
+
+    model = model || (await Post.create(body))
+    await user.updateOne({
+      $inc: {
+        ['options.publish_nums']: 1,
+        ['options.publish_total']: 1
+      }
+    })
+    return res.send(model)
+  } catch (e) {
+    console.log(e)
+    res.status(500).send({ msg: '创建时出现错误', code: 1 })
   }
-)
+})
 
 router.put('/edit', checkPostField(), auth(), async (req, res) => {
   const id = req.query.id
@@ -252,43 +201,37 @@ router.put('/edit', checkPostField(), auth(), async (req, res) => {
   }
 })
 
-router.delete(
-  '/',
-  auth(/* {
-    async func(model) {
-      await model.updateOne({
+router.delete('/', auth(), async (req, res) => {
+  const id = req.query.id
+  if (!id) {
+    return res.status(400).send({ ok: 0, msg: '参数不正确' })
+  }
+  try {
+    const user = await User.findOne({ uid: req.uid })
+    const model = await Post.findOneAndDelete({
+      _id: new require('mongoose').Types.ObjectId(id),
+      author: req.username
+    })
+
+    // 删除对应的评论
+    const delQuery = await Comment.deleteMany({ pid: model.pid })
+
+    if (model && model.state === 1) {
+      await user.updateOne({
         $inc: {
-          ['options.publish_nums']: -1
+          ['options.publish_nums']: -1,
+          ['options.comments_nums']: -delQuery.deletedCount || 0
         }
       })
+
+      res.send({ ok: 1 })
+    } else {
+      return res.status(400).send({ ok: 0, msg: '找不到对应的文章' })
     }
-  } */),
-  async (req, res) => {
-    const id = req.query.id
-    if (!id) {
-      return res.status(400).send({ ok: 0, msg: '参数不正确' })
-    }
-    try {
-      const user = await User.findOne({ uid: req.uid })
-      const model = await Post.findOneAndDelete({
-        _id: new require('mongoose').Types.ObjectId(id),
-        author: req.username
-      })
-      if (model && model.state === 1) {
-        await user.updateOne({
-          $inc: {
-            ['options.publish_nums']: -1
-          }
-        })
-        res.send({ ok: 1 })
-      } else {
-        return res.status(400).send({ ok: 0, msg: '找不到对应的文章' })
-      }
-    } catch (e) {
-      return res.status(500).send({ ok: 0 })
-    }
+  } catch (e) {
+    return res.status(500).send({ ok: 0 })
   }
-)
+})
 
 // 保存与草稿
 router.post('/save', checkPostField(), auth(), async (req, res) => {

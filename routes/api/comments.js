@@ -25,6 +25,9 @@ router.post('/', checkCommentsField, async (req, res) => {
     if (post) {
       query.post = post
       await query.save()
+      // 增加Post中的数量
+      post.comments += 1
+      await post.save()
     }
     await author.updateOne({
       $inc: {
@@ -56,6 +59,7 @@ router.get('/', auth, async (req, res) => {
 
 router.delete('/', auth, async (req, res) => {
   const id = req.query.id
+
   // 这里提供了两种删除方式 根据 _id 和 cid
 
   if (id) {
@@ -63,16 +67,16 @@ router.delete('/', auth, async (req, res) => {
     var query
     try {
       if (isCid) {
-        query = await Comment.deleteOne({
+        query = await Comment.findOneAndDelete({
           cid: id
-        })
+        }).populate('post')
       } else {
-        query = await Comment.deleteOne({
+        query = await Comment.findOneAndDelete({
           _id: id
-        })
+        }).populate('post')
       }
 
-      if (query.deletedCount === 1) {
+      if (query) {
         await User.updateOne(
           { username: req.username },
           {
@@ -81,8 +85,12 @@ router.delete('/', auth, async (req, res) => {
             }
           }
         )
+        // 删除post中的comments数量
+        query.post.comments--
+        await query.post.save()
       }
-      return res.send(query)
+
+      return res.send({ ok: 1, n: 1, deleteCount: 1 })
     } catch (e) {
       console.log(e)
       return res.send({ ok: 0, msg: '参数不正确' })
