@@ -20,6 +20,9 @@ const Schema = new mongoose.Schema({
     type: String,
     default: String(Date.now())
   },
+  email: {
+    type: String
+  },
   options: {
     type: Object,
     default: {

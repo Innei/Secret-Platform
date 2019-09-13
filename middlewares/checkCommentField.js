@@ -14,6 +14,9 @@ function getClientIP(req) {
   }
   return ip
 }
+/**
+ * 检查评论中是否存在 {author, content, email, pid}
+ */
 module.exports = options => {
   return async (req, res, next) => {
     const token = req.headers['authorization']
@@ -21,10 +24,11 @@ module.exports = options => {
     if (!body.author) {
       return res.status(422).send({ msg: '姓名不能为空' })
     } else {
-      const isExist = (await User.find({ username: body.author }))
+      const isExist = (await User.findOne({ username: body.author }))
         ? true
         : false
       if (isExist && !token) {
+        
         return res.status(422).send({ msg: '该用户名已被占用' })
       }
     }
@@ -34,7 +38,7 @@ module.exports = options => {
     if (!body.email) {
       return res.status(422).send({ msg: '邮箱不能为空' })
     }
-    if (!body.createTime || !body.modifyTime) {
+    if (!body.createTime) {
       body.createTime = Date.now()
     }
     if (!body.pid) {

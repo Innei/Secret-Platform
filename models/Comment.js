@@ -32,7 +32,6 @@ const schema = new mongoose.Schema({
     required: true
   },
   email: {
-    required: true,
     type: String
   },
   url: {

@@ -5,7 +5,7 @@ const Post = require('../../models/Post.js')
 const CheckUserIsExist = require('../../middlewares/CheckUserIsExist.js')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const assert = require('http-assert')
+const auth = require('./../../middlewares/auth')()
 module.exports = app => {
   const router = express.Router()
 
@@ -37,13 +37,13 @@ module.exports = app => {
     res.send(model)
   })
 
-  router.get('/:id', CheckUserIsExist(), async (req, res) => {
+  router.get('/:id', CheckUserIsExist(), auth, async (req, res) => {
     const id = req.params.id
     const model = await User.findOne({ uid: id })
     res.send(model)
   })
 
-  router.get('/get_info/:id', CheckUserIsExist(), async (req, res) => {
+  router.get('/get_info/:id', CheckUserIsExist(), auth, async (req, res) => {
     const user = await User.findOne({ uid: req.params.id })
     const posts = await Post.find({ author: user.username })
       .limit(5)
