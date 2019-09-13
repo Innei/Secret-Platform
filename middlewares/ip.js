@@ -27,19 +27,21 @@ module.exports = (options = {}) => {
     const formatTime = moment(dUNIX).format('YYYY-MM-DD HH:mm:ss')
     // 获取 ip
     const ip = getClientIP(req)
-
-    await Access.create({
-      time: Date.now(dUNIX),
-      formatTime,
-      ip,
-      path: req.originalUrl,
-      method: req.method,
-      fullDate: {
-        year,
-        month,
-        day
-      }
-    })
+    const recordAccess = req.app.get('config').recordAccess
+    if (recordAccess) {
+      await Access.create({
+        time: Date.now(dUNIX),
+        formatTime,
+        ip,
+        path: req.originalUrl,
+        method: req.method,
+        fullDate: {
+          year,
+          month,
+          day
+        }
+      })
+    }
     // console.log(`[${chalk.yellow(formatTime)}] 来源IP ${chalk.green(ip)}`)
     log(
       `From IP ${chalk.green(ip)} to ${req.method} ${req.originalUrl} ${

@@ -52,10 +52,11 @@ Content-Type: application/json
 ### comment 
 post {{api}}/posts/comments
 Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3ODQ2ODE0fQ.ribJ-CbqN3JNu3Q1QbpDE1O4w58KQUOWa7wVUsIvHs8
 
 {
   "pid": 11,
-  "author": "y",
+  "author": "test",
   "content": "传闻已久的Windows Core OS正在为“下一代”微软设备做准备，最新的微软软件工程师LinkedIn个人资料信息暗示如此。“经验丰富的C++开发人员，具有云管理操作系统开发方面的专业知识。在物联网设备，下一代WCOS设备，Windows桌面，HoloLens和Windows Server上提供基于Azure的设备管理功能和协议，”该工程师在简介中写道。",
   "email": "y"
 }
@@ -66,4 +67,12 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoi
 
 ### comments delete
 delete {{api}}/posts/comments?id=14
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3ODQ2ODE0fQ.ribJ-CbqN3JNu3Q1QbpDE1O4w58KQUOWa7wVUsIvHs8
+
+###
+get {{api}}/posts/comments/info
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3ODQ2ODE0fQ.ribJ-CbqN3JNu3Q1QbpDE1O4w58KQUOWa7wVUsIvHs8
+
+### modify comment state
+put {{api}}/posts/comments/?id=17&state=1
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3ODQ2ODE0fQ.ribJ-CbqN3JNu3Q1QbpDE1O4w58KQUOWa7wVUsIvHs8

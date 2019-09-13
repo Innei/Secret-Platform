@@ -90,10 +90,7 @@ router.get('/list', auth(), async (req, res) => {
     keyword || state !== -1
       ? // ? Math.ceil(model.length / size)
         1
-      : Math.ceil(
-          (await User.findOne({ username: req.username })).options
-            .publish_nums / size
-        )
+      : Math.ceil((await Post.countDocuments()) / size)
   const currentPage = Number(page)
   res.send({
     options: {

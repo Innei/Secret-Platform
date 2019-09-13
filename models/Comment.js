@@ -13,7 +13,7 @@ const schema = new mongoose.Schema({
   },
   post: {
     type: mongoose.SchemaTypes.ObjectId,
-    ref: "Post"
+    ref: 'Post'
   },
   content: {
     type: String,
@@ -39,7 +39,8 @@ const schema = new mongoose.Schema({
     type: String
   },
   parent: {
-    type: Number
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'Comment'
   },
   ipAddress: {
     type: String,

@@ -20,9 +20,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(require('cors')())
 app.set('views', require('path').join(__dirname, 'views'))
 app.set('view engine', 'ejs')
-if (app.get('config').recordAccess) {
-  app.use(ip)
-}
+app.use(ip)
+
 app.use(express.json())
 
 require('./routes/api/index')(app)
@@ -39,6 +38,6 @@ app.listen(3000, () => {
 // require('express-async-errors')
 app.use(async (err, req, res, next) => {
   res.status(err.statusCode || 500).send({
-    message: err.message || '未知错误'
+    msg: err.message || '未知错误'
   })
 })

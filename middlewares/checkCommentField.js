@@ -1,3 +1,6 @@
+const User = require('../models/User')
+const jwt = require('jsonwebtoken')
+
 function getClientIP(req) {
   var ip =
     req.headers['x-forwarded-for'] ||
@@ -13,21 +16,50 @@ function getClientIP(req) {
 }
 module.exports = options => {
   return async (req, res, next) => {
+    const token = req.headers['authorization']
     const body = req.body
     if (!body.author) {
       return res.status(422).send({ msg: '姓名不能为空' })
-    } else if (!body.content) {
+    } else {
+      const isExist = (await User.find({ username: body.author }))
+        ? true
+        : false
+      if (isExist && !token) {
+        return res.status(422).send({ msg: '该用户名已被占用' })
+      }
+    }
+    if (!body.content) {
       return res.status(422).send({ msg: '内容不能为空' })
-    } else if (!body.email) {
+    }
+    if (!body.email) {
       return res.status(422).send({ msg: '邮箱不能为空' })
-    } else if (!body.createTime || !body.modifyTime) {
+    }
+    if (!body.createTime || !body.modifyTime) {
       body.createTime = Date.now()
-    } else if (!body.pid) {
+    }
+    if (!body.pid) {
       return res.status(422).send({ msg: '评论文章不能为空' })
     }
-    if (!body.isPoster) {
+
+    if (!token) {
       req.body.isPoster = false
+    } else {
+      try {
+        const obj = jwt.verify(token, req.app.get('config').key)
+        const id = obj.id
+        const model = await User.findById(id)
+        if (model && model.username) {
+          req.body.isPoster = model.username === body.author ? true : false
+          req.body.state = req.body.isPoster ? 1 : 0
+        }
+      } catch (e) {
+        return res.status(500).send({
+          msg: '发生错误',
+          code: 3
+        })
+      }
     }
+
     req.body.ipAddress = getClientIP(req)
     await next()
   }

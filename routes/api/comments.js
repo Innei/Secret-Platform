@@ -54,7 +54,35 @@ router.get('/', auth, async (req, res) => {
     .limit(size)
     .sort({ createTime: -1 })
     .populate('post')
-  res.send(query)
+
+  const totalPage = Math.ceil((await Comment.countDocuments(state)) / size)
+  const currentPage = Number(page)
+  res.send({
+    data: query,
+    options: {
+      totalPage,
+      currentPage,
+      hasNextPage: currentPage < totalPage ? true : false,
+      hasPreviousPage: currentPage > 1 ? true : false,
+      isFirst: currentPage === 1 ? true : false,
+      isLast: currentPage === totalPage ? true : false
+    }
+  })
+})
+
+/**
+ * 获取评论各类型的数量的接口
+ */
+router.get('/info', auth, async (req, res) => {
+  const passed = await Comment.find({ state: 1 }).count()
+  const gomi = await Comment.find({ state: 2 }).count()
+  const needChecked = await Comment.find({ state: 0 }).count()
+
+  res.send({
+    passed,
+    gomi,
+    needChecked
+  })
 })
 
 router.delete('/', auth, async (req, res) => {
@@ -97,5 +125,46 @@ router.delete('/', auth, async (req, res) => {
     }
   }
   return res.send({ ok: 0, msg: '请输入正确的ID' })
+})
+
+router.put('/', auth, async (req, res) => {
+  const id = req.query.id
+  const state = Number(req.query.state)
+  if (!state || !id) {
+    return res.status(400).send({ msg: '错误的请求' })
+  }
+
+  const isCid = id.length !== 24 ? true : false
+  var query
+  try {
+    if (isCid) {
+      query = await Comment.updateOne(
+        {
+          cid: id
+        },
+        { state }
+      )
+    } else {
+      query = await Comment.updateOne(
+        {
+          _id: id
+        },
+        { state }
+      )
+    }
+
+    return res.send(query)
+  } catch (e) {
+    console.log(e)
+    return res.send({ ok: 0, msg: '参数不正确' })
+  }
+})
+
+/**
+ * 处理评论回复的路由
+ */
+router.post('/reply', async (req, res) => {
+  const cid = req.body.cid
+  // const 
 })
 module.exports = router
