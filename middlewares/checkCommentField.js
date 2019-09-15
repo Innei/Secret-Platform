@@ -28,7 +28,6 @@ module.exports = options => {
         ? true
         : false
       if (isExist && !token) {
-        
         return res.status(422).send({ msg: '该用户名已被占用' })
       }
     }
@@ -46,15 +45,15 @@ module.exports = options => {
     }
 
     if (!token) {
-      req.body.isPoster = false
+      req.body.isOwner = false
     } else {
       try {
         const obj = jwt.verify(token, req.app.get('config').key)
         const id = obj.id
         const model = await User.findById(id)
         if (model && model.username) {
-          req.body.isPoster = model.username === body.author ? true : false
-          req.body.state = req.body.isPoster ? 1 : 0
+          req.body.isOwner = model.username === body.author ? true : false
+          req.body.state = req.body.isOwner ? 1 : 0
         }
       } catch (e) {
         return res.status(500).send({
@@ -63,7 +62,7 @@ module.exports = options => {
         })
       }
     }
-
+    req.body.userAgent = req.useragent.source
     req.body.ipAddress = getClientIP(req)
     await next()
   }

@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
-const Config = require('./Config')
 const schema = new mongoose.Schema({
   pid: {
-    type: Number
+    type: Number,
+    unique: true
   },
   author: {
     type: String,
@@ -68,5 +68,16 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0
   }
+})
+schema.index({
+  author: 1
+})
+schema.index({
+  author: 1,
+  pid: -1
+})
+schema.index({
+  pid: -1,
+  state: 1
 })
 module.exports = mongoose.model('Post', schema)

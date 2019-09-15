@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const Schema = new mongoose.Schema({
   uid: {
     type: Number,
-    required: true
+    required: true,
+    unique: true
   },
   username: {
     type: String,
@@ -33,5 +34,6 @@ const Schema = new mongoose.Schema({
     }
   }
 })
-
+Schema.index({ username: 1 })
+Schema.index({ uid: 1 })
 module.exports = mongoose.model('User', Schema)

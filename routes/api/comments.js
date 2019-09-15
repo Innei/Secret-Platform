@@ -16,8 +16,15 @@ router.post('/', checkCommentsField, async (req, res) => {
     username: (await Post.findOne({ pid })).author
   })
   const cid = author.options.comments_total + 1
-  body.cid = cid
 
+  const comments = await Comment.countDocuments({
+    pid,
+    key: new RegExp(`^${pid}#\\d\\d\\d$`)
+  })
+
+  body.cid = cid
+  body.owner = author.username
+  body.key = String(pid) + `#${String(comments + 1).padStart(3, 0)}`
   const post = await Post.findOne({ pid })
 
   try {
@@ -57,7 +64,9 @@ router.get('/', auth, async (req, res) => {
     .populate('post')
     .populate('parent')
 
-  const totalPage = Math.ceil((await Comment.countDocuments(state)) / size)
+  const totalPage = Math.ceil(
+    (await Comment.countDocuments({ ...state, owner: req.username })) / size
+  )
   const currentPage = Number(page)
   res.send({
     data: query,
@@ -76,9 +85,12 @@ router.get('/', auth, async (req, res) => {
  * 获取评论各类型的数量的接口
  */
 router.get('/info', auth, async (req, res) => {
-  const passed = await Comment.countDocuments({ state: 1 })
-  const gomi = await Comment.countDocuments({ state: 2 })
-  const needChecked = await Comment.countDocuments({ state: 0 })
+  const passed = await Comment.countDocuments({ state: 1, owner: req.username })
+  const gomi = await Comment.countDocuments({ state: 2, owner: req.username })
+  const needChecked = await Comment.countDocuments({
+    state: 0,
+    owner: req.username
+  })
 
   res.send({
     passed,
@@ -89,12 +101,12 @@ router.get('/info', auth, async (req, res) => {
 
 router.delete('/', auth, async (req, res) => {
   const id = req.query.id
-  // TODO 删除父评论同时删除子评论
+
   // 这里提供了两种删除方式 根据 _id 和 cid
 
   if (id) {
     const isCid = id.length !== 24 ? true : false
-    var query
+    var query, delCount
     try {
       if (isCid) {
         query = await Comment.findOneAndDelete({
@@ -107,20 +119,27 @@ router.delete('/', auth, async (req, res) => {
       }
 
       if (query) {
+        // delCount = await delComments(query)
+        if (query.hasChild) {
+          delCount =
+            (await Comment.deleteMany({
+              key: new RegExp(`^${query.key}`, 'ig')
+            })).deletedCount + 1
+        }
         await User.updateOne(
           { username: req.username },
           {
             $inc: {
-              'options.comments_nums': -1
+              'options.comments_nums': -(delCount || 1)
             }
           }
         )
         // 删除post中的comments数量
-        query.post.comments--
+        query.post.comments -= delCount || 1
         await query.post.save()
       }
 
-      return res.send({ ok: 1, n: 1, deleteCount: 1 })
+      return res.send({ ok: 1, n: 1, deleteCount: delCount || 1 })
     } catch (e) {
       console.log(e)
       return res.send({ ok: 0, msg: '参数不正确' })
@@ -170,24 +189,33 @@ router.post('/reply', checkCommentsField, async (req, res) => {
   const cid = Number(req.body.cid)
   asset(cid, 400, '错误的请求')
   const parent = await Comment.findOne({ cid }).populate('post')
-
+  asset(parent, 400, '不存在父评论')
+  await parent.updateOne({
+    hasChild: true
+  })
   const author = await User.findOne({
     username: parent.post.author
   })
+  const commentsPatents = await Comment.countDocuments({
+    key: new RegExp(`^${parent.key}#\\d\\d\\d$`)
+  })
   req.body.cid = author.options.comments_total + 1
-
+  req.body.key = parent.key + `#${String(commentsPatents + 1).padStart(3, 0)}`
   const model = {
     parent,
+    owner: parent.owner,
     post: new require('mongoose').Types.ObjectId(parent.post._id),
     ...req.body
   }
+  const query = await Comment.create(model)
+  parent.post.comments++
+  await parent.post.save()
   await author.updateOne({
     $inc: {
       'options.comments_total': 1,
       'options.comments_nums': 1
     }
   })
-  const query = await Comment.create(model)
   res.send({ ok: 1, query })
 })
 module.exports = router

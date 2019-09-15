@@ -8,16 +8,14 @@ try {
   const config = require('./config.inc.js')
   app.set('config', config)
 } catch (err) {
-  process.exit(-1, () => {
-    return console.log(
-      chalk.red('配置文件不存在, 请使用同目录下的 install.js 进行安装')
-    )
-  })
+  console.log(chalk.red('配置文件不存在, 请使用同目录下的 install.js 进行安装'))
+  process.exit(-1)
 }
 
 // 全局使用中间件
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(require('cors')())
+app.use(require('express-useragent').express())
 app.set('views', require('path').join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.use(ip)

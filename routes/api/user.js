@@ -45,14 +45,23 @@ module.exports = app => {
 
   router.get('/get_info/:id', CheckUserIsExist(), auth, async (req, res) => {
     const user = await User.findOne({ uid: req.params.id })
-    const posts = await Post.find({ author: user.username })
+    const recentlyPosts = await Post.find({ author: user.username })
       .limit(5)
-      .sort({ _id: -1 })
-
+      .sort({ modifyTime: -1 })
+    const recentlyComments = await require('../../models/Comment')
+      .find({
+        owner: user.username,
+        $or: [{ state: 1 }, { state: 0 }]
+      })
+      .limit(5)
+      .sort({
+        cid: -1
+      })
     // 生成响应数据
     const userInfo = {
       ...user._doc,
-      recentlyPosts: posts
+      recentlyPosts,
+      recentlyComments
     }
     res.send(userInfo)
   })
@@ -61,7 +70,7 @@ module.exports = app => {
     const { username, password } = req.body
     const user = await User.findOne({ username }).select('+password')
     if (!user) {
-      res.status(422).send({
+      return res.status(422).send({
         msg: '用户不存在',
         code: 422
       })
@@ -74,10 +83,10 @@ module.exports = app => {
         const username = user.username
         const key = app.get('config').key
         const token = jwt.sign({ uid, username, id: user._id }, key)
-        res.send({ msg: '验证成功', token })
+        return res.send({ msg: '验证成功', token })
       }
     } catch (err) {
-      res.status(401).send({ msg: '验证失败' })
+      return res.status(401).send({ msg: '验证失败' })
     }
   })
   app.use('/api/user', router)

@@ -35,7 +35,7 @@ Content-Type: application/json
 get {{api}}/user/5
 
 ### get posts list
-get {{api}}/posts?&state=2
+get {{api}}/posts/list?state=1
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3NDI1NzcyfQ.J5idUWC6WnSNjd5N5ChIUfY3LrCSLuGPJNC2tYaM9K4
 
 
@@ -66,7 +66,7 @@ get {{api}}/posts/comments
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3ODQ2ODE0fQ.ribJ-CbqN3JNu3Q1QbpDE1O4w58KQUOWa7wVUsIvHs8
 
 ### comments delete
-delete {{api}}/posts/comments?id=14
+delete {{api}}/posts/comments?id=46
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInVzZXJuYW1lIjoidGVzdCIsImlkIjoiNWQ2Y2EwZGViNDJmZDcxN2M3ZmU5NjA0IiwiaWF0IjoxNTY3ODQ2ODE0fQ.ribJ-CbqN3JNu3Q1QbpDE1O4w58KQUOWa7wVUsIvHs8
 
 ###
@@ -83,7 +83,7 @@ Content-Type: application/json
 
 {
   "pid": 11,
-  "cid": 26,
+  "cid": 47,
   "author": "tww",
   "content": "### reply",
   "email": "y1"

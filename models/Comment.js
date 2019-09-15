@@ -4,7 +4,8 @@ const schema = new mongoose.Schema({
   // comment id
   cid: {
     type: Number,
-    required: true
+    required: true,
+    unique: true
   },
   // post id
   pid: {
@@ -27,7 +28,11 @@ const schema = new mongoose.Schema({
     type: String,
     required: true
   },
-  isPoster: {
+  owner: {
+    type: String,
+    required: true
+  },
+  isOwner: {
     type: Boolean,
     required: true
   },
@@ -37,10 +42,16 @@ const schema = new mongoose.Schema({
   url: {
     type: String
   },
+  key: {
+    type: String,
+    required: true,
+    unique: true
+  },
   parent: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'Comment'
   },
+  hasChild: { type: Boolean, default: false },
   ipAddress: {
     type: String,
     required: true
@@ -55,5 +66,9 @@ const schema = new mongoose.Schema({
     default: 0
   }
 })
-
+schema.index({ state: 1 })
+schema.index({ cid: 1 })
+schema.index({ parent: 1 })
+schema.index({ key: 1 })
+schema.index({ pid: 1 })
 module.exports = mongoose.model('Comment', schema)

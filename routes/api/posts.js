@@ -76,6 +76,9 @@ router.get('/list', auth(), async (req, res) => {
             },
             { content: new RegExp(keyword, 'ig') }
           ],
+          // $text: {
+          //   $search: keyword
+          // },
           ...status
         }).sort({ modifyTime: -1 })
       : await Post.find({
@@ -90,7 +93,8 @@ router.get('/list', auth(), async (req, res) => {
     keyword || state !== -1
       ? // ? Math.ceil(model.length / size)
         1
-      : Math.ceil((await Post.countDocuments()) / size)
+      : Math.ceil((await Post.countDocuments({ author: req.username })) / size)
+  
   const currentPage = Number(page)
   res.send({
     options: {
