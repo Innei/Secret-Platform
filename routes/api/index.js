@@ -11,4 +11,5 @@ module.exports = app => {
 
   router.use('/posts/', require('./posts'))
   router.use('/upload', require('./upload'))
+  // router.use('/options', require('./options'))
 }

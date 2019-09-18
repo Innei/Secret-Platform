@@ -13,9 +13,10 @@ module.exports = app => {
 
   router
     .post('/signup', async (req, res) => {
+      const Field = await Config.findOne({ name: 'User-Num' })
       if (
         req.app.get('config').singleMode === true &&
-        (await Config.findOne({ name: 'User-Num' })).value > 0
+        Field && Field.value > 0
       ) {
         return res.send({ msg: '不允许注册!', ok: 0 })
       }
@@ -25,7 +26,6 @@ module.exports = app => {
       if (isExist) {
         return res.send({ msg: '用户已存在', code: 1 })
       }
-      const Field = await Config.findOne({ name: 'User-Num' })
       const uid = Field ? Number(Field.value) + 1 : 1
 
       if (!Field) {
