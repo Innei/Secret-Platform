@@ -11,18 +11,18 @@ module.exports = app => {
   const router = express.Router()
 
   router.get('/', (req, res) => {
-    res.render('index')
+    res.render('404')
   })
 
-  // 注册页面
+  /* // 注册页面
   router.get('/signup', ip, async (req, res) => {
     res.render('user/index')
-  })
+  }) */
   // 渲染文章
   router.get('/posts/:id', ip, async (req, res) => {
     const id = req.params.id
     await Post.findById(id)
-      .then(model => {
+      .then(async model => {
         if (model.state === 0) {
           return res.status(404).send({ msg: '页面不存在' })
         }
@@ -43,7 +43,7 @@ module.exports = app => {
             render.limitTime = '无限制'
           }
           model.views++
-          model.save()
+          await model.save()
           return res.render('post', render)
         } else {
           if (

@@ -31,7 +31,14 @@ app.use('/static', express.static('./static'))
 app.listen(3000, () => {
   log('Server is up, http://localhost:3000')
 })
-
+try {
+  if (require('fs').existsSync('admin')) {
+    app.use('/admin', express.static('./admin'))
+  }
+} catch (e) {}
+app.use((req, res, next) => {
+  res.status(404).render('404')
+})
 // 全局错误处理
 // require('express-async-errors')
 app.use(async (err, req, res, next) => {

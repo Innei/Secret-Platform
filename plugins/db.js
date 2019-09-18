@@ -4,6 +4,7 @@ module.exports = app => {
   mongoose.connect('mongodb://localhost:27017/secret-platform', {
     useFindAndModify: false,
     useNewUrlParser: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useUnifiedTopology: true
   })
 }

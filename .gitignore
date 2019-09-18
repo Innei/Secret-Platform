@@ -65,3 +65,5 @@ config.js
 config.inc.js
 online.http
 /.idea
+
+/admin
