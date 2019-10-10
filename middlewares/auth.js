@@ -40,7 +40,7 @@ module.exports = (options = {}) => {
           code: 3
         })
       }
-      await next()
+      next()
     }
   }
 }
