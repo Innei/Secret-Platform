@@ -83,8 +83,11 @@ Content-Type: application/json
 
 {
   "pid": 11,
-  "cid": 47,
+  "cid": 59,
   "author": "tww",
   "content": "### reply",
   "email": "y1"
 }
+
+### get comment list by pid (user)
+get {{api}}/posts/comments/11
