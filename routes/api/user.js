@@ -139,7 +139,7 @@ module.exports = app => {
         const { password, newPassword } = req.body
         assert(password, 422, '请输入旧密码')
         assert(newPassword, 422, '请输入新密码')
-        assert(password !== password, 422, '新密码不能重复')
+        assert(password !== newPassword, 422, '新密码不能重复')
         const row = await User.findOne({ uid: req.uid }).select('+password')
 
         assert(bcrypt.compareSync(password, row.password), 422, '密码不匹配')
@@ -148,5 +148,17 @@ module.exports = app => {
         res.send(exec)
       })
 
+      .put('/update', auth, async (req, res) => {
+        const { username, email } = req.body
+        assert(username, 422, '用户名不能为空')
+        const model = await User.findOne({ uid: req.uid })
+        const r = await model.update({
+          $set: {
+            username,
+            email
+          }
+        })
+        res.send(r)
+      })
   app.use('/api/user', router)
 }
