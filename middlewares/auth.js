@@ -9,15 +9,21 @@ module.exports = (options = {}) => {
   /**
    * 验证是否为空的验证头，并将 Username 解密挂载到 req.username 上, uid 模型挂载到 req.uid
    *
-   * @code: Number => 1: blank Authorization Header, 2: Invalid User， 3: verify crashed
    * @msg: String
    */
   return async (req, res, next) => {
     const token = req.headers['authorization']
     if (token === undefined) {
-      return res.status(401).send({ msg: '空的验证头', code: 1 })
+      return res.status(401).send({ msg: '空的验证头' })
     } else {
-      const obj = jwt.verify(token, req.app.get('config').key)
+      let obj
+      try {
+        obj = jwt.verify(token, req.app.get('config').key)
+      } catch (e) {
+        if (e.message === 'invalid signature')
+          res.status(401).send({ msg: '验证已过期' })
+        else throw e
+      }
       try {
         const id = obj.id
         const model = await User.findById(id)
@@ -30,14 +36,13 @@ module.exports = (options = {}) => {
           req.uid = model.uid
         } else {
           return res.status(401).send({
-            msg: '用户不存在',
-            code: 2
+            msg: '用户不存在'
           })
         }
       } catch (e) {
+        console.log(e)
         return res.status(500).send({
-          msg: '发生错误',
-          code: 3
+          msg: '发生错误'
         })
       }
       next()

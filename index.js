@@ -19,8 +19,11 @@ app.use(require('express-useragent').express())
 app.set('views', require('path').join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.use(ip)
-
 app.use(express.json())
+
+// 初始化
+
+require('./plugins/refreshKey')(app)
 
 require('./routes/api/index')(app)
 require('./plugins/db')(app)

@@ -15,19 +15,22 @@ module.exports = app => {
         code: 422
       })
     }
-
     const isVerify = bcrypt.compareSync(password, user.password)
     try {
       if (isVerify) {
         const uid = user.uid
         const username = user.username
         const key = app.get('config').key
-        const token = jwt.sign({ uid, username, id: user._id}, key)
+        const token = jwt.sign({ uid, username, id: user._id }, key, {
+          expiresIn: '7d'
+        })
+
         res.send({ msg: '验证成功', token })
       }
     } catch (err) {
       res.status(422).send({ msg: '验证失败' })
     }
+    res.status(401).send({ msg: '验证失败' })
   })
   app.use('/api/login', router)
 }

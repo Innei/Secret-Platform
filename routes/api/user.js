@@ -13,10 +13,10 @@ module.exports = app => {
 
   router
       .post('/signup', async (req, res) => {
-        const Field = await Config.findOne({ name: 'User-Num' })
+        const document = await Config.findOne({ name: 'User-Num' })
         if (
             req.app.get('config').singleMode === true &&
-            Field && Field.value > 0
+            document && document.value > 0
         ) {
           return res.send({
             msg: '不允许注册!',
@@ -32,15 +32,15 @@ module.exports = app => {
             code: 1
           })
         }
-        const uid = Field ? Number(Field.value) + 1 : 1
+        const uid = document ? Number(document.value) + 1 : 1
 
-        if (!Field) {
+        if (!document) {
           await Config.create({
             name: 'User-Num',
             value: 1
           })
         } else {
-          await Field.update({
+          await document.update({
             $inc: {
               value: 1
             }
@@ -107,7 +107,10 @@ module.exports = app => {
               uid,
               username,
               id: user._id
-            }, key)
+            }, key,
+            {
+              expiresIn: '7d'
+            })
             return res.send({
               msg: '验证成功',
               token,
@@ -117,6 +120,7 @@ module.exports = app => {
         } catch (err) {
           return res.status(401).send({ msg: '验证失败' })
         }
+        return res.status(401).send({ msg: '验证失败' })
       })
 
       .get('/info', async (req, res) => {
@@ -124,7 +128,6 @@ module.exports = app => {
         if (hasUser.length === 0) {
           return res.send({
             msg: '不存在用户',
-            actions: 'need Install',
             ok: 0
           })
         }
@@ -145,6 +148,7 @@ module.exports = app => {
         assert(bcrypt.compareSync(password, row.password), 422, '密码不匹配')
         const uid = req.uid
         const exec = await User.updateOne({ uid }, { password: newPassword })
+        require('../../plugins/refreshKey')(app)
         res.send(exec)
       })
 
